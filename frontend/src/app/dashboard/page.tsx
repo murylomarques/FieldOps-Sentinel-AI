@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
@@ -23,12 +23,12 @@ const defaultKpi: KpiData = {
 };
 
 const agents = [
-  { name: "Agente de Intake", status: "active", hint: "Normalizando ordens" },
-  { name: "Agente de Risco", status: "active", hint: "Atraso / no-show / reagendamento" },
-  { name: "Agente de Dispatch", status: "active", hint: "Prioridade e redistribuição" },
-  { name: "Agente de Policy Guard", status: "enforcing", hint: "Regras de skill e SLA" },
-  { name: "Agente de Explicabilidade", status: "active", hint: "Resumo técnico e executivo" },
-  { name: "Agente de Relatório Executivo", status: "active", hint: "Gargalos e impacto" },
+  { name: "Intake Agent", status: "active", hint: "Normalizing incoming service orders" },
+  { name: "Risk Scoring Agent", status: "active", hint: "Delay, no-show, reschedule, SLA breach" },
+  { name: "Dispatch Recommendation Agent", status: "active", hint: "Building recovery interventions" },
+  { name: "Policy Guard Agent", status: "enforcing", hint: "Validating hard business constraints" },
+  { name: "Explainability Agent", status: "active", hint: "Generating deterministic rationale" },
+  { name: "Executive Insights Agent", status: "active", hint: "Aggregating operational bottlenecks" },
 ];
 
 export default function DashboardPage() {
@@ -38,7 +38,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const token = getToken();
-    apiFetch<KpiData>("/api/v1/dashboard/kpis", {}, token).then(setKpi).catch(console.error);
+    apiFetch<KpiData>("/api/v1/dashboard/summary", {}, token).then(setKpi).catch(console.error);
     apiFetch<Array<{ region: string; risk_score: number }>>("/api/v1/dashboard/risk-by-region", {}, token)
       .then(setRegionData)
       .catch(console.error);
@@ -46,9 +46,9 @@ export default function DashboardPage() {
   }, []);
 
   const headline = useMemo(() => {
-    if (kpi.percent_orders_at_risk >= 50) return "Risco operacional elevado detectado";
-    if (kpi.percent_orders_at_risk >= 30) return "Risco moderado, operação pode estabilizar com ação rápida";
-    return "Operação estável com controle preditivo";
+    if (kpi.percent_orders_at_risk >= 50) return "High operational risk detected";
+    if (kpi.percent_orders_at_risk >= 30) return "Moderate risk, intervention required";
+    return "Operation stable under predictive control";
   }, [kpi.percent_orders_at_risk]);
 
   return (
@@ -59,18 +59,18 @@ export default function DashboardPage() {
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <p className="mb-2 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em]">
-                  <Sparkles size={14} /> Inteligência Agentic de Operações
+                  <Sparkles size={14} /> Agentic Operations Intelligence
                 </p>
-                <h1 className="font-display text-3xl font-bold">Centro de Comando</h1>
-                <p className="mt-2 text-sm text-slate-200">{headline}. Aprovação humana e políticas de negócio permanecem obrigatórias.</p>
+                <h1 className="font-display text-3xl font-bold">Command Center</h1>
+                <p className="mt-2 text-sm text-slate-200">{headline}. Human approval remains mandatory for critical interventions.</p>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
-                  <p className="text-xs text-slate-300">Ordens em Risco</p>
+                  <p className="text-xs text-slate-300">Orders at Risk</p>
                   <p className="text-xl font-bold">{kpi.percent_orders_at_risk.toFixed(1)}%</p>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
-                  <p className="text-xs text-slate-300">Impacto Operacional</p>
+                  <p className="text-xs text-slate-300">Operational Impact</p>
                   <p className="text-xl font-bold">{kpi.estimated_operational_impact.toFixed(1)}%</p>
                 </div>
               </div>
@@ -78,27 +78,27 @@ export default function DashboardPage() {
           </section>
 
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <Card className="p-5"><p className="text-xs uppercase tracking-wider text-slate-500">Risco Médio de SLA</p><p className="mt-2 text-3xl font-bold text-slate-900">{kpi.avg_sla_risk_score.toFixed(1)}</p><p className="mt-2 text-xs text-slate-500">Índice de risco por ordem ativa.</p></Card>
-            <Card className="p-5"><p className="text-xs uppercase tracking-wider text-slate-500">Taxa de Aprovação</p><p className="mt-2 text-3xl font-bold text-slate-900">{kpi.approval_rate.toFixed(1)}%</p><p className="mt-2 text-xs text-slate-500">Decisões críticas aceitas por humanos.</p></Card>
-            <Card className="p-5"><p className="text-xs uppercase tracking-wider text-slate-500">Taxa de Override</p><p className="mt-2 text-3xl font-bold text-slate-900">{kpi.override_rate.toFixed(1)}%</p><p className="mt-2 text-xs text-slate-500">Intervenções humanas sobre a IA.</p></Card>
-            <Card className="p-5"><p className="text-xs uppercase tracking-wider text-slate-500">Latência de Inferência</p><p className="mt-2 text-3xl font-bold text-slate-900">{kpi.avg_response_latency_ms.toFixed(1)} ms</p><p className="mt-2 text-xs text-slate-500">Tempo de resposta do pipeline multiagente.</p></Card>
+            <Card className="p-5"><p className="text-xs uppercase tracking-wider text-slate-500">Average SLA Risk</p><p className="mt-2 text-3xl font-bold text-slate-900">{kpi.avg_sla_risk_score.toFixed(1)}</p><p className="mt-2 text-xs text-slate-500">Aggregated breach pressure index.</p></Card>
+            <Card className="p-5"><p className="text-xs uppercase tracking-wider text-slate-500">Approval Rate</p><p className="mt-2 text-3xl font-bold text-slate-900">{kpi.approval_rate.toFixed(1)}%</p><p className="mt-2 text-xs text-slate-500">Human accepted interventions.</p></Card>
+            <Card className="p-5"><p className="text-xs uppercase tracking-wider text-slate-500">Override Rate</p><p className="mt-2 text-3xl font-bold text-slate-900">{kpi.override_rate.toFixed(1)}%</p><p className="mt-2 text-xs text-slate-500">Human overrides over AI recommendations.</p></Card>
+            <Card className="p-5"><p className="text-xs uppercase tracking-wider text-slate-500">Inference Latency</p><p className="mt-2 text-3xl font-bold text-slate-900">{kpi.avg_response_latency_ms.toFixed(1)} ms</p><p className="mt-2 text-xs text-slate-500">Multi-agent response time.</p></Card>
           </div>
 
           <div className="grid gap-5 xl:grid-cols-3">
             <Card className="xl:col-span-2 p-5">
               <div className="mb-4 flex items-center justify-between">
                 <div>
-                  <h2 className="font-display text-lg font-bold text-slate-900">Mapa de Risco por Região</h2>
-                  <p className="text-xs text-slate-500">Concentração de risco operacional em tempo quase real.</p>
+                  <h2 className="font-display text-lg font-bold text-slate-900">Risk by Region</h2>
+                  <p className="text-xs text-slate-500">Regional concentration of operational risk.</p>
                 </div>
-                <Badge label="Ao vivo" tone="blue" />
+                <Badge label="Live" tone="blue" />
               </div>
               <RiskByRegionChart data={regionData} />
             </Card>
 
             <Card className="p-5">
-              <h2 className="font-display text-lg font-bold text-slate-900">Fila de Aprovação Humana</h2>
-              <p className="text-xs text-slate-500">Recomendações críticas aguardando decisão.</p>
+              <h2 className="font-display text-lg font-bold text-slate-900">Approval Queue</h2>
+              <p className="text-xs text-slate-500">Critical recommendations waiting for decision.</p>
               <div className="mt-4 space-y-3">
                 {queue.slice(0, 6).map((item) => (
                   <div key={item.decision_id} className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
@@ -109,13 +109,13 @@ export default function DashboardPage() {
                     <p className="text-xs text-slate-500">{item.action_type}</p>
                   </div>
                 ))}
-                {!queue.length && <p className="text-sm text-slate-500">Sem recomendações pendentes.</p>}
+                {!queue.length && <p className="text-sm text-slate-500">No pending recommendations.</p>}
               </div>
             </Card>
           </div>
 
           <Card className="p-5">
-            <div className="mb-4 flex items-center gap-2"><BrainCircuit size={18} className="text-primary" /><h2 className="font-display text-lg font-bold text-slate-900">Runtime dos Agentes de IA</h2></div>
+            <div className="mb-4 flex items-center gap-2"><BrainCircuit size={18} className="text-primary" /><h2 className="font-display text-lg font-bold text-slate-900">Agent Runtime</h2></div>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {agents.map((agent) => (
                 <div key={agent.name} className="rounded-2xl border border-slate-200 p-3">
@@ -128,8 +128,8 @@ export default function DashboardPage() {
               ))}
             </div>
             <div className="mt-4 flex flex-wrap gap-2 text-xs">
-              <span className="metric-chip inline-flex items-center gap-1"><Clock3 size={12} /> Latência média {kpi.avg_response_latency_ms.toFixed(1)}ms</span>
-              <span className="metric-chip inline-flex items-center gap-1"><AlertTriangle size={12} /> Atrasos evitados (proj.) {kpi.projected_avoided_delays}</span>
+              <span className="metric-chip inline-flex items-center gap-1"><Clock3 size={12} /> Avg latency {kpi.avg_response_latency_ms.toFixed(1)}ms</span>
+              <span className="metric-chip inline-flex items-center gap-1"><AlertTriangle size={12} /> Projected avoided delays {kpi.projected_avoided_delays}</span>
             </div>
           </Card>
         </motion.div>

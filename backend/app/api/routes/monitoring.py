@@ -1,4 +1,4 @@
-from sqlalchemy import func
+﻿from sqlalchemy import func
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -19,7 +19,7 @@ def model_monitoring(db: Session = Depends(get_db), _user: User = Depends(get_cu
     avg_metric = db.query(func.avg(ModelMetric.metric_value)).scalar() or 0
     drift = db.query(func.avg(ModelMetric.drift_score)).scalar() or 0
 
-    total_decisions = db.query(Decision).filter(Decision.human_decision.in_(["approved", "rejected"])) .count()
+    total_decisions = db.query(Decision).filter(Decision.human_decision.in_(["approved", "rejected"])).count()
     overrides = db.query(Decision).filter(Decision.human_decision == "rejected").count()
     override_rate = (overrides / total_decisions) * 100 if total_decisions else 0
 

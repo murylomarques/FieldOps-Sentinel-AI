@@ -1,24 +1,34 @@
-import json
+﻿import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import joblib
 import pandas as pd
 from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
-from xgboost import XGBClassifier
+
+try:
+    from xgboost import XGBClassifier
+
+    HAS_XGBOOST = True
+except Exception:
+    HAS_XGBOOST = False
 
 DATA_PATH = Path("ml/data/synthetic_orders.csv")
 MODEL_DIR = Path("ml/models")
+ARTIFACT_DIR = Path("ml/artifacts")
 REPORT_DIR = Path("ml/reports")
 
 TARGETS = {
     "delay": "risk_delay_label",
     "noshow": "risk_no_show_label",
     "reschedule": "risk_reschedule_label",
+    "sla_breach": "risk_sla_breach_label",
 }
 
 FEATURES = [
@@ -35,7 +45,6 @@ FEATURES = [
     "sla_hours_remaining",
     "estimated_duration_minutes",
 ]
-
 
 
 def compute_metrics(y_true, y_pred, y_proba):
@@ -86,22 +95,37 @@ def build_pipeline():
         ]
     )
 
-    model = XGBClassifier(
-        n_estimators=180,
-        max_depth=5,
-        learning_rate=0.07,
-        subsample=0.95,
-        colsample_bytree=0.95,
-        eval_metric="logloss",
-        random_state=42,
-    )
+    if HAS_XGBOOST:
+        model = XGBClassifier(
+            n_estimators=180,
+            max_depth=5,
+            learning_rate=0.07,
+            subsample=0.95,
+            colsample_bytree=0.95,
+            eval_metric="logloss",
+            random_state=42,
+        )
+    else:
+        model = GradientBoostingClassifier(random_state=42)
 
     pipeline = Pipeline(steps=[("preprocess", preprocess), ("model", model)])
     return pipeline
 
 
+def _extract_feature_importance(pipeline: Pipeline, feature_names: list[str]) -> dict[str, float]:
+    model = pipeline.named_steps["model"]
+    if hasattr(model, "feature_importances_"):
+        raw = model.feature_importances_
+        mapped = {}
+        for idx, value in enumerate(raw[: len(feature_names)]):
+            mapped[feature_names[idx]] = float(value)
+        return mapped
+    return {name: 0.0 for name in feature_names}
+
+
 def main() -> None:
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
 
     if not DATA_PATH.exists():
@@ -111,6 +135,9 @@ def main() -> None:
     X = df[FEATURES]
 
     report = {}
+    feature_importance = {}
+    registry = {"updated_at": datetime.now(timezone.utc).isoformat(), "models": {}}
+
     for model_name, target_col in TARGETS.items():
         y = df[target_col]
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
@@ -126,7 +153,13 @@ def main() -> None:
         model_path = MODEL_DIR / f"{model_name}_model.pkl"
         joblib.dump(pipeline, model_path)
 
-    # Backend fallback-compatible feature list
+        feature_importance[model_name] = _extract_feature_importance(pipeline, FEATURES)
+        registry["models"][model_name] = {
+            "path": str(model_path),
+            "framework": "xgboost" if HAS_XGBOOST else "sklearn_gradient_boosting",
+            "metrics": metrics,
+        }
+
     feature_columns = [
         "technician_load",
         "distance_km",
@@ -143,6 +176,8 @@ def main() -> None:
     ]
     (MODEL_DIR / "feature_columns.json").write_text(json.dumps(feature_columns, indent=2), encoding="utf-8")
     (REPORT_DIR / "model_metrics.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+    (REPORT_DIR / "feature_importance.json").write_text(json.dumps(feature_importance, indent=2), encoding="utf-8")
+    (ARTIFACT_DIR / "registry.json").write_text(json.dumps(registry, indent=2), encoding="utf-8")
 
     print("Training complete. Metrics:")
     print(json.dumps(report, indent=2))

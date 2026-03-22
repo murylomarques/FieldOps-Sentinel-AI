@@ -1,117 +1,203 @@
-# FIELDOPS SENTINEL AI
+﻿# FIELDOPS SENTINEL AI
 
-**Plataforma agentic de inteligência operacional para operações de campo em ambiente real.**
+**Operational Loss Prevention Engine for Field Service**
 
-Este projeto foi construído para demonstrar um produto de IA aplicado a operações críticas, com arquitetura robusta, governança humana, explicabilidade e visão executiva.
+FIELDOPS Sentinel AI is an **agentic operations intelligence platform for field service teams**. It predicts operational failure risk, estimates economic exposure, simulates recovery options, recommends the lowest-cost feasible intervention under constraints, enforces human approval for critical actions, and stores a complete audit trail.
 
-## Posicionamento
-O FIELDOPS Sentinel AI apoia operações de:
-- telecomunicações;
-- utilities;
-- manutenção técnica;
-- centros de despacho;
-- gestão operacional.
+## Why This Project Exists
+Field operations teams in telecom, utilities, maintenance, and dispatch centers lose revenue through preventable operational failures:
+- failed truck rolls
+- SLA breaches
+- avoidable reschedules
+- poor regional balancing
+- low decision traceability
 
-## Problemas Reais que o Sistema Resolve
-- ordens mal priorizadas;
-- risco elevado de atraso, no-show e reagendamento;
-- quebra de SLA por decisão tardia;
-- desequilíbrio de carga entre técnicos e regiões;
-- falta de explicabilidade das recomendações da IA;
-- ausência de auditoria em decisões críticas.
+This project demonstrates a practical, locally runnable architecture for reducing those losses.
 
-## Diferenciais de Nível Enterprise
-- pipeline multiagente funcional (não é chatbot genérico);
-- recomendação operacional com policy guard;
-- fluxo Humano no Loop obrigatório para ações críticas;
-- trilha auditável por `request_id` e `decision_id`;
-- dashboard executivo premium para operação e liderança;
-- seed automático com dados realistas para prova de valor imediata.
+## Product Thesis
+This is not a chatbot wrapper.
 
-## Arquitetura Geral
+The platform combines:
+- predictive risk scoring (delay, no-show, reschedule, SLA breach)
+- constrained scenario generation
+- optimization-guided intervention selection
+- policy guardrails
+- human-in-the-loop approval
+- replayable and auditable decision lifecycle
+
+## Architecture Overview
+- **Frontend**: Next.js 15 + TypeScript + Tailwind + Recharts + Framer Motion
+- **Backend**: FastAPI + Pydantic v2 + SQLAlchemy 2 + PostgreSQL + JWT auth
+- **ML**: synthetic data generation + tabular model training (XGBoost fallback path documented)
+- **Optimization**: OR-Tools CP-SAT when available with deterministic heuristic fallback
+- **Observability**: structured logging, request correlation, decision_id traceability, metrics endpoint, audit logs
 
 ```mermaid
 flowchart LR
-  UI[Next.js Frontend] --> API[FastAPI Backend]
-  API --> IA[Agente de Intake]
-  IA --> RS[Agente de Risco]
-  RS --> DR[Agente de Recomendação Operacional]
-  DR --> PG[Agente de Política e Guardrails]
-  PG --> EX[Agente de Explicabilidade]
-  EX --> DB[(PostgreSQL)]
-  DB --> ER[Agente de Relatório Executivo]
-  API --> MON[APIs de Monitoramento e Auditoria]
-  ML[Pipeline de Treino] --> ART[Artefatos de Modelo]
+  UI[Next.js Frontend] --> API[FastAPI API]
+  API --> IA[Intake Agent]
+  IA --> RS[Risk Scoring Agent]
+  RS --> SG[Scenario Generation Agent]
+  SG --> OPT[Optimization Agent]
+  OPT --> PG[Policy Guard Agent]
+  PG --> EX[Explainability Agent]
+  EX --> REC[Recommendation + Decision]
+  REC --> HITL[Human Approval]
+  HITL --> AUD[(Audit Logs + Events)]
+  API --> SIM[What-if Simulation]
+  API --> REP[Replay Service]
+  ML[Model Training Pipeline] --> ART[Model Artifacts]
   ART --> RS
+  API --> DB[(PostgreSQL)]
 ```
 
-## Fluxo Multiagente
-1. **Agente de Intake**
-   - normaliza dados da ordem;
-   - valida campos obrigatórios;
-   - classifica o contexto da ordem.
+## Core Workflows
+1. Order ingestion and normalization
+2. Risk scoring and factor extraction
+3. Scenario generation with economic impact estimation
+4. Feasible scenario optimization
+5. Policy enforcement and approval gating
+6. Recommendation publication and human decision capture
+7. Audit and replay timeline persistence
 
-2. **Agente de Risco**
-   - calcula risco de atraso;
-   - calcula risco de no-show;
-   - calcula risco de reagendamento;
-   - devolve score consolidado e fatores de influência.
-
-3. **Agente de Recomendação Operacional**
-   - sugere prioridade e janela operacional;
-   - propõe redistribuição de técnico/região;
-   - combina heurística operacional com score de risco.
-
-4. **Agente de Política e Guardrails**
-   - bloqueia sugestões sem skill compatível;
-   - sinaliza risco de SLA crítico;
-   - impõe aprovação humana para alto impacto.
-
-5. **Agente de Explicabilidade**
-   - gera explicação executiva;
-   - gera explicação operacional;
-   - facilita auditoria e confiança.
-
-6. **Agente de Relatório Executivo**
-   - consolida gargalos;
-   - identifica regiões de maior risco;
-   - aponta pressão de backlog.
-
-## Humano no Loop
-- recomendações críticas ficam em `pending_human_approval`;
-- operador decide aprovar/rejeitar;
-- justificativa humana é registrada;
-- decisão final é rastreada e auditada.
-
-## Stack Técnica
+## Tech Stack
 ### Frontend
-- Next.js 15
+- Next.js 15 (App Router)
 - TypeScript
 - Tailwind CSS
-- estrutura `shadcn/ui`
 - Recharts
 - Framer Motion
 
 ### Backend
+- Python 3.12
 - FastAPI
-- Pydantic
-- SQLAlchemy
+- Pydantic v2
+- SQLAlchemy 2.x
 - PostgreSQL
-- JWT
+- JWT + Passlib bcrypt
 
-### IA / Analytics
+### AI / Optimization
 - pandas
 - numpy
 - scikit-learn
-- XGBoost
+- xgboost
+- OR-Tools CP-SAT (fallback supported)
 
-### Infra e Qualidade
+### Infra / Tooling
 - Docker Compose
 - Makefile
-- `.env.example`
-- GitHub Actions (lint + teste + build)
+- GitHub Actions
+- Ruff + pytest
+- ESLint + Prettier
 
-## Estrutura do Repositório
+## Local Setup
+1. Copy environment file:
+   - `cp .env.example .env`
+2. Build and run:
+   - `docker compose up --build`
+3. Access:
+   - Frontend: `http://localhost:3000/login`
+   - API docs: `http://localhost:8000/docs`
+   - Health: `http://localhost:8000/health`
+   - Metrics: `http://localhost:8000/metrics`
+
+## Environment Variables
+See `.env.example`.
+
+Key variables:
+- `DATABASE_URL` (optional full override)
+- `POSTGRES_*`
+- `SECRET_KEY`
+- `JWT_EXPIRE_MINUTES`
+- `CORS_ORIGINS`
+- `MODEL_DELAY_PATH`, `MODEL_NOSHOW_PATH`, `MODEL_RESCHEDULE_PATH`, `MODEL_SLA_PATH`
+
+## Demo Credentials
+- `manager@fieldops.ai / manager123`
+- `dispatcher@fieldops.ai / dispatcher123`
+- `analyst@fieldops.ai / analyst123`
+
+## Data Generation and Model Training
+Generate synthetic data:
+- `python ml/scripts/generate_synthetic_data.py --rows 5000`
+
+Train risk models:
+- `python ml/scripts/train_models.py`
+
+Output artifacts include:
+- model `.pkl` files
+- `ml/models/feature_columns.json`
+- `ml/reports/model_metrics.json`
+- `ml/reports/feature_importance.json`
+- `ml/artifacts/registry.json`
+
+## Risk Scoring and Optimization Logic
+The system scores:
+- delay risk
+- no-show risk
+- reschedule risk
+- SLA breach risk
+
+Consolidated risk uses weighted fusion and deterministic feature contribution summaries.
+
+Scenarios are generated per order, filtered by feasibility, then selected via CP-SAT (or deterministic fallback) to maximize projected net operational benefit.
+
+## Economic Impact Model
+Each scenario estimates:
+- cost of inaction
+- cost of intervention
+- projected SLA penalty avoided
+- repeat-visit loss avoided
+- no-show loss avoided
+- projected total operational loss avoided
+
+Full formula details: `docs/economic-impact.md`.
+
+## Human-in-the-Loop Approval Flow
+Critical recommendations are kept in `pending_human_approval`.
+
+Authorized users can approve or reject with justification. The platform records:
+- decision actor
+- timestamp
+- recommendation status transition
+- override feedback category
+- audit log record
+
+## Observability and Auditability
+Implemented today:
+- request_id middleware
+- decision_id lifecycle tracking
+- structured logging hooks
+- audit logs for critical actions
+- `/metrics` endpoint for internal counters/gauges
+- order event timeline for replay
+
+## API Overview
+Main domains:
+- Auth
+- Orders
+- Risk
+- Recommendations
+- Approvals
+- Simulations
+- Dashboard/Insights
+- Replay
+- System endpoints
+
+Detailed API contract: `docs/api.md`.
+
+## Screens and UX Overview
+Implemented routes:
+- `/login`
+- `/dashboard`
+- `/orders`
+- `/orders/[id]`
+- `/recommendations`
+- `/insights`
+- `/monitoring`
+- `/replay/[id]`
+
+## Project Structure
 ```text
 /frontend
 /backend
@@ -122,95 +208,33 @@ flowchart LR
 /.github/workflows
 ```
 
-## Execução Local
-1. Copie variáveis de ambiente:
-   - `cp .env.example .env`
-2. Suba os serviços:
-   - `docker compose up -d --build`
-3. Acesse:
-   - Frontend: `http://localhost:3000/login`
-   - Swagger: `http://localhost:8000/docs`
+## Testing
+Backend tests cover:
+- auth
+- orders listing
+- risk scoring flow
+- recommendation flow
+- approve/reject
+- simulation endpoint
+- replay endpoint
 
-## Credenciais de Demonstração
-- `manager@fieldops.ai / manager123`
-- `dispatcher@fieldops.ai / dispatcher123`
-- `analyst@fieldops.ai / analyst123`
+Run:
+- `make test`
 
-## Prova de Valor com Dados Reais
-Quando o banco inicia vazio, o sistema realiza auto-seed com cenário operacional completo.
+## Production Considerations
+- add Alembic migrations for schema evolution
+- move rate-limiting state to distributed storage
+- harden metrics/telemetry exporters
+- add model/version rollout and shadow evaluation
+- split async orchestration for high-volume workloads
 
-Exemplo real validado:
-- `orders`: 180
-- `recommendations`: 180
-- `decisions`: 180
-- com aprovações e rejeições humanas registradas.
+## Known Limitations
+Documented in `docs/assumptions.md`.
 
-Endpoint para validação:
-- `GET /api/v1/dashboard/demo-status`
-
-## Pipeline de Dados e Treino
-### Gerar dataset sintético
-- `python ml/scripts/generate_synthetic_data.py --rows 5000`
-
-### Treinar modelos
-- `python ml/scripts/train_models.py`
-
-### Alimentar ordens via API
-- `python scripts/seed_demo_data.py --rows 120`
-
-## Módulos do Produto
-- **Login Operacional**
-- **Centro de Comando**
-- **Grade de Ordens**
-- **Detalhe de Caso com IA**
-- **Fila de Recomendações Críticas**
-- **Insights Executivos**
-- **Monitoramento de Modelo**
-
-## Métricas de Negócio Expostas
-- percentual de ordens em risco;
-- risco médio de SLA;
-- taxa de aprovação humana;
-- taxa de override humano;
-- latência média de resposta;
-- atrasos evitados projetados;
-- redução de backlog projetada;
-- impacto operacional estimado.
-
-## Observabilidade e Governança
-- logs estruturados;
-- correlação por `request_id`;
-- rastreio por `decision_id`;
-- auditoria em `audit_logs`;
-- monitoramento de latência e drift;
-- política de aprovação humana para ações críticas.
-
-## Segurança
-- configuração por ambiente;
-- validação forte de entrada;
-- CORS;
-- JWT;
-- rate limiting básico;
-- sem segredos de produção no código.
-
-## Documentação Complementar
-- Endpoints: `docs/endpoints.md`
-- Arquitetura: `docs/architecture.md`
-
-## Considerações de Produção
-- migrações com Alembic;
-- rate limit distribuído com Redis;
-- OpenTelemetry + Prometheus + Grafana;
-- filas assíncronas para alta escala;
-- versionamento e rollout controlado de modelos.
-
-## Roadmap
-- otimização geoespacial real de rotas;
-- ingestão de eventos em tempo real;
-- reasoning com LLM para incidentes complexos;
-- modo multi-tenant SaaS;
-- online learning;
-- integrações ERP/CRM/WFM.
-
-## Resumo
-Este projeto representa um blueprint realista de IA aplicada a operações: produto com apresentação premium, arquitetura sólida e governança adequada para contexto corporativo.
+## Future Improvements
+- real route optimization with richer constraints
+- event streaming for real-time operations
+- online learning loops from override feedback
+- multi-tenant SaaS boundaries
+- external WFM/ERP integrations
+- richer replay outcome attribution

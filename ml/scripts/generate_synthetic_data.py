@@ -1,4 +1,4 @@
-import argparse
+﻿import argparse
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -53,6 +53,8 @@ def generate(n_rows: int = 5000) -> pd.DataFrame:
         traffic_level = float(np.round(RNG.uniform(0, 1), 2))
         backlog_region = int(RNG.integers(10, 80))
         sla_hours_remaining = float(np.round(RNG.uniform(1, 72), 2))
+        order_value = float(np.round(RNG.uniform(180, 1400), 2))
+        projected_sla_penalty = float(np.round(RNG.uniform(80, 650), 2))
 
         priority_encoded = {"low": 0, "medium": 1, "high": 2, "critical": 3}[priority]
         service_encoded = {"installation": 0, "repair": 1, "inspection": 2, "maintenance": 3, "emergency": 4}[service]
@@ -83,10 +85,20 @@ def generate(n_rows: int = 5000) -> pd.DataFrame:
             - (0.03 * sla_hours_remaining)
             + (0.18 * priority_encoded)
         )
+        sla_breach_logit = (
+            -2.0
+            + (0.038 * backlog_region)
+            + (0.42 * traffic_level)
+            + (0.36 * rain_level)
+            + (0.31 * previous_reschedules)
+            - (0.07 * sla_hours_remaining)
+            + (0.12 * priority_encoded)
+        )
 
         delay = int(RNG.random() < sigmoid(np.array([delay_logit]))[0])
         noshow = int(RNG.random() < sigmoid(np.array([noshow_logit]))[0])
         reschedule = int(RNG.random() < sigmoid(np.array([reschedule_logit]))[0])
+        sla_breach = int(RNG.random() < sigmoid(np.array([sla_breach_logit]))[0])
 
         rows.append(
             {
@@ -110,9 +122,12 @@ def generate(n_rows: int = 5000) -> pd.DataFrame:
                 "backlog_region": backlog_region,
                 "sla_hours_remaining": sla_hours_remaining,
                 "estimated_duration_minutes": duration,
+                "order_value": order_value,
+                "projected_sla_penalty": projected_sla_penalty,
                 "risk_delay_label": delay,
                 "risk_no_show_label": noshow,
                 "risk_reschedule_label": reschedule,
+                "risk_sla_breach_label": sla_breach,
             }
         )
 

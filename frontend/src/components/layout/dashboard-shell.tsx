@@ -1,17 +1,18 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Activity, Bot, ChartNoAxesCombined, ClipboardList, Gauge, LogOut, ShieldCheck, Sparkles } from "lucide-react";
+import { Activity, Bot, ChartNoAxesCombined, ClipboardList, Gauge, History, LogOut, ShieldCheck, Sparkles } from "lucide-react";
 import { clearToken } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 const items = [
-  { href: "/dashboard", label: "Centro de Comando", icon: Gauge, hint: "Operação ao vivo" },
-  { href: "/orders", label: "Ordens", icon: ClipboardList, hint: "Fluxo de casos" },
-  { href: "/recommendations", label: "Recomendações", icon: Bot, hint: "Fila da IA" },
-  { href: "/insights", label: "Insights Executivos", icon: ChartNoAxesCombined, hint: "Impacto no negócio" },
-  { href: "/monitoring", label: "Monitoramento de Modelo", icon: Activity, hint: "Confiabilidade e drift" },
+  { href: "/dashboard", label: "Command Center", icon: Gauge, hint: "Live operations" },
+  { href: "/orders", label: "Orders", icon: ClipboardList, hint: "Case flow" },
+  { href: "/recommendations", label: "Recommendations", icon: Bot, hint: "AI approval queue" },
+  { href: "/insights", label: "Executive Insights", icon: ChartNoAxesCombined, hint: "Business impact" },
+  { href: "/monitoring", label: "Model Monitoring", icon: Activity, hint: "Reliability and drift" },
+  { href: "/replay/ORD-DEMO-00001", label: "Replay", icon: History, hint: "Incident timeline" },
 ];
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
@@ -28,17 +29,17 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             </div>
             <div>
               <p className="font-display text-xs uppercase tracking-[0.16em] text-slate-500">FieldOps Sentinel AI</p>
-              <h1 className="font-display text-lg font-bold text-slate-900">Inteligência Operacional</h1>
+              <h1 className="font-display text-lg font-bold text-slate-900">Operations Intelligence</h1>
             </div>
           </div>
           <div className="mt-4 flex items-center gap-2 text-xs text-slate-600">
-            <ShieldCheck size={14} className="text-secondary" /> Ações críticas com governança humana
+            <ShieldCheck size={14} className="text-secondary" /> Critical actions with human governance
           </div>
         </div>
 
         <nav className="mt-5 space-y-2">
           {items.map((item) => {
-            const active = pathname.startsWith(item.href);
+            const active = pathname.startsWith(item.href.split("/").slice(0, 2).join("/"));
             const Icon = item.icon;
             return (
               <Link
@@ -72,7 +73,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           }}
           className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
         >
-          <LogOut size={15} /> Sair
+          <LogOut size={15} /> Sign out
         </button>
       </aside>
 

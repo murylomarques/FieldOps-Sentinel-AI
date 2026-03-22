@@ -1,4 +1,4 @@
-export type Role = "manager" | "dispatcher" | "analyst";
+﻿export type Role = "manager" | "dispatcher" | "analyst";
 
 export interface KpiData {
   percent_orders_at_risk: number;
@@ -38,6 +38,7 @@ export interface Order {
 }
 
 export interface RecommendationQueue {
+  id: number;
   decision_id: string;
   order_id: string;
   confidence: number;
@@ -47,5 +48,3 @@ export interface RecommendationQueue {
   recommended_priority: string;
   created_at: string;
 }
-
-

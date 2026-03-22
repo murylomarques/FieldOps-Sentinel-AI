@@ -1,13 +1,19 @@
-from app.core.security import get_password_hash
+﻿from app.core.security import get_password_hash
 from app.db.base import Base
-from app.db.session import engine, SessionLocal
+from app.db.session import SessionLocal, engine
 from app.models.audit import AuditLog
 from app.models.decision import Decision
+from app.models.human_decision import HumanDecision
+from app.models.intervention_scenario import InterventionScenario
 from app.models.metric import ModelMetric
 from app.models.order import Order
+from app.models.order_event import OrderEvent
+from app.models.override_feedback import OverrideFeedback
 from app.models.recommendation import Recommendation
+from app.models.risk_assessment import RiskAssessment
+from app.models.technician import Technician
 from app.models.user import User
-from app.services.demo_data_service import bootstrap_demo_operations
+from app.services.demo_data_service import bootstrap_demo_operations, seed_technicians
 
 
 def init_db() -> None:
@@ -22,6 +28,9 @@ def init_db() -> None:
             ]
             db.add_all(users)
             db.commit()
+
+        if not db.query(Technician).count():
+            seed_technicians(db)
 
         if not db.query(Order).count():
             bootstrap_demo_operations(db, n_orders=180)

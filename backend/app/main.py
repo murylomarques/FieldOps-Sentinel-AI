@@ -1,16 +1,21 @@
-from contextvars import ContextVar
+﻿from contextvars import ContextVar
 from uuid import uuid4
 
 import structlog
-from fastapi import Depends, FastAPI, Request
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
+from sqlalchemy import func
 
-from app.api.routes import auth, dashboard, monitoring, orders, recommendations
+from app.api.routes import auth, dashboard, monitoring, orders, recommendations, replay, simulations
 from app.core.config import get_settings
 from app.core.logging import setup_logging
 from app.core.rate_limit import InMemoryRateLimiter
 from app.db.init_db import init_db
+from app.db.session import SessionLocal
+from app.models.decision import Decision
+from app.models.metric import ModelMetric
+from app.models.recommendation import Recommendation
 
 setup_logging()
 logger = structlog.get_logger()
@@ -70,8 +75,40 @@ def health() -> dict:
     return {"status": "ok", "service": "fieldops-sentinel-ai"}
 
 
+@app.get("/metrics")
+def metrics() -> PlainTextResponse:
+    db = SessionLocal()
+    try:
+        requests_count = db.query(ModelMetric).count()
+        recommendations = db.query(Recommendation).count()
+        approvals = db.query(Decision).filter(Decision.human_decision == "approved").count()
+        rejections = db.query(Decision).filter(Decision.human_decision == "rejected").count()
+        latency = db.query(func.avg(ModelMetric.latency_ms)).scalar() or 0.0
+        loss_avoided = (
+            db.query(func.sum(Recommendation.impact_score * 100)).scalar() or 0.0
+        )
+        override_rate = (rejections / (approvals + rejections)) * 100 if (approvals + rejections) else 0.0
+
+        content = "\n".join(
+            [
+                f"fieldops_requests_total {requests_count}",
+                f"fieldops_recommendations_total {recommendations}",
+                f"fieldops_approvals_total {approvals}",
+                f"fieldops_rejections_total {rejections}",
+                f"fieldops_avg_latency_ms {float(latency):.4f}",
+                f"fieldops_projected_loss_avoided_total {float(loss_avoided):.4f}",
+                f"fieldops_override_rate {float(override_rate):.4f}",
+            ]
+        )
+        return PlainTextResponse(content=content)
+    finally:
+        db.close()
+
+
 app.include_router(auth.router, prefix=settings.api_v1_prefix)
 app.include_router(orders.router, prefix=settings.api_v1_prefix)
 app.include_router(recommendations.router, prefix=settings.api_v1_prefix)
 app.include_router(dashboard.router, prefix=settings.api_v1_prefix)
 app.include_router(monitoring.router, prefix=settings.api_v1_prefix)
+app.include_router(simulations.router, prefix=settings.api_v1_prefix)
+app.include_router(replay.router, prefix=settings.api_v1_prefix)

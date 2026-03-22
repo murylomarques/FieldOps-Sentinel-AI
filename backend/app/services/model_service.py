@@ -1,4 +1,4 @@
-import json
+﻿import json
 from pathlib import Path
 
 import joblib
@@ -14,6 +14,7 @@ class ModelService:
         self.delay_model = self._load_model(settings.model_delay_path)
         self.noshow_model = self._load_model(settings.model_noshow_path)
         self.reschedule_model = self._load_model(settings.model_reschedule_path)
+        self.sla_model = self._load_model(settings.model_sla_path)
         self.feature_columns = self._load_feature_columns(settings.feature_columns_path)
 
     @staticmethod
@@ -70,17 +71,26 @@ class ModelService:
         )
         fallback_noshow = 0.12 + 0.05 * encoded.get("customer_history_no_show", 0) + 0.01 * encoded.get("rain_level", 0)
         fallback_reschedule = 0.18 + 0.04 * encoded.get("previous_reschedules", 0) + 0.02 * encoded.get("distance_km", 0) / 10
+        fallback_sla = (
+            0.2
+            + 0.016 * encoded.get("backlog_region", 0)
+            + 0.15 * encoded.get("traffic_level", 0)
+            + 0.12 * encoded.get("rain_level", 0)
+            - 0.02 * encoded.get("sla_hours_remaining", 0)
+        )
 
         delay = self._predict_single(self.delay_model, encoded, fallback_delay)
         no_show = self._predict_single(self.noshow_model, encoded, fallback_noshow)
         reschedule = self._predict_single(self.reschedule_model, encoded, fallback_reschedule)
+        sla_breach = self._predict_single(self.sla_model, encoded, fallback_sla)
 
         factors = self.explain_factors(encoded)
-        overall = float(np.clip((delay * 0.45) + (no_show * 0.25) + (reschedule * 0.30), 0.0, 1.0))
+        overall = float(np.clip((delay * 0.35) + (no_show * 0.2) + (reschedule * 0.2) + (sla_breach * 0.25), 0.0, 1.0))
         return {
             "delay_risk": delay,
             "no_show_risk": no_show,
             "reschedule_risk": reschedule,
+            "sla_breach_risk": sla_breach,
             "overall_risk": overall,
             "factors": factors,
         }

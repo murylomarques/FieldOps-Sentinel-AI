@@ -1,10 +1,4 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  experimental: {
-    typedRoutes: true,
-  },
-};
+﻿/** @type {import('next').NextConfig} */
+const nextConfig = {};
 
 export default nextConfig;
-
-

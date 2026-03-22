@@ -1,4 +1,5 @@
-from datetime import datetime
+﻿from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -31,6 +32,7 @@ class ApprovalRequest(BaseModel):
 
 
 class RecommendationQueueItem(BaseModel):
+    id: int
     decision_id: str
     order_id: str
     confidence: float

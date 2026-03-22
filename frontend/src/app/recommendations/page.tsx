@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { Bot, CheckCircle2, XCircle } from "lucide-react";
@@ -24,16 +24,15 @@ export default function RecommendationsPage() {
     loadQueue();
   }, []);
 
-  async function decide(decisionId: string, approve: boolean) {
+  async function decide(item: RecommendationQueue, approve: boolean) {
     const token = getToken();
+    const path = approve ? `/api/v1/recommendations/${item.id}/approve` : `/api/v1/recommendations/${item.id}/reject`;
     await apiFetch(
-      "/api/v1/recommendations/approve",
+      path,
       {
         method: "POST",
         body: JSON.stringify({
-          decision_id: decisionId,
-          approve,
-          justification: notes[decisionId] || "Revisado pelo dispatcher",
+          justification: notes[item.decision_id] || "Reviewed by dispatcher",
         }),
       },
       token
@@ -45,8 +44,8 @@ export default function RecommendationsPage() {
     <AuthGuard>
       <DashboardShell>
         <Card className="p-5">
-          <div className="mb-4 flex items-center gap-2"><Bot size={18} className="text-primary" /><h1 className="font-display text-2xl font-bold text-slate-900">Fila de Recomendacoes da IA</h1></div>
-          <p className="text-sm text-slate-500">Recomendacoes de alto impacto exigem aprovacao humana explicita com justificativa.</p>
+          <div className="mb-4 flex items-center gap-2"><Bot size={18} className="text-primary" /><h1 className="font-display text-2xl font-bold text-slate-900">Recommendation Queue</h1></div>
+          <p className="text-sm text-slate-500">High-impact interventions require explicit human approval with an audit-ready justification.</p>
 
           <div className="mt-5 space-y-4">
             {queue.map((item) => (
@@ -54,29 +53,29 @@ export default function RecommendationsPage() {
                 <div className="mb-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                   <div>
                     <p className="font-semibold text-slate-900">{item.order_id} - {item.action_type}</p>
-                    <p className="text-xs text-slate-500">Decisao {item.decision_id}</p>
+                    <p className="text-xs text-slate-500">Decision {item.decision_id}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge label={`${(item.confidence * 100).toFixed(1)}% confianca`} tone="blue" />
-                    <Badge label={`${(item.impact_score * 100).toFixed(1)}% impacto`} tone="amber" />
+                    <Badge label={`${(item.confidence * 100).toFixed(1)}% confidence`} tone="blue" />
+                    <Badge label={`${(item.impact_score * 100).toFixed(1)}% impact`} tone="amber" />
                     <Badge label={item.status} tone="amber" />
                   </div>
                 </div>
 
                 <Textarea
                   rows={2}
-                  placeholder="Justificativa humana para trilha de auditoria"
+                  placeholder="Human rationale for audit trail"
                   value={notes[item.decision_id] || ""}
                   onChange={(e) => setNotes((prev) => ({ ...prev, [item.decision_id]: e.target.value }))}
                 />
 
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <Button onClick={() => decide(item.decision_id, true)} className="inline-flex items-center gap-2"><CheckCircle2 size={14} /> Aprovar</Button>
-                  <Button variant="danger" onClick={() => decide(item.decision_id, false)} className="inline-flex items-center gap-2"><XCircle size={14} /> Rejeitar</Button>
+                  <Button onClick={() => decide(item, true)} className="inline-flex items-center gap-2"><CheckCircle2 size={14} /> Approve</Button>
+                  <Button variant="danger" onClick={() => decide(item, false)} className="inline-flex items-center gap-2"><XCircle size={14} /> Reject</Button>
                 </div>
               </div>
             ))}
-            {!queue.length && <p className="text-sm text-slate-500">Nao ha recomendacoes pendentes.</p>}
+            {!queue.length && <p className="text-sm text-slate-500">No pending recommendations.</p>}
           </div>
         </Card>
       </DashboardShell>

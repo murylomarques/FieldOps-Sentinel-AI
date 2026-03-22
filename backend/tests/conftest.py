@@ -1,4 +1,5 @@
-import os
+﻿import os
+from contextlib import suppress
 from pathlib import Path
 
 import pytest
@@ -19,4 +20,5 @@ def client():
         yield test_client
 
     if TEST_DB.exists():
-        TEST_DB.unlink()
+        with suppress(PermissionError):
+            TEST_DB.unlink()

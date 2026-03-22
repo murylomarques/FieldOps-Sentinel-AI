@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -33,7 +33,7 @@ export default function LoginPage() {
       setToken(data.access_token);
       router.push("/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Falha no login");
+      setError(err instanceof Error ? err.message : "Login failed");
     } finally {
       setLoading(false);
     }
@@ -46,17 +46,19 @@ export default function LoginPage() {
         <div className="absolute -right-12 bottom-12 h-64 w-64 rounded-full bg-indigo-400/25 blur-3xl" />
         <div className="relative z-10 max-w-xl">
           <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs uppercase tracking-[0.16em]">
-            <Sparkles size={13} /> FieldOps Sentinel AI
+            <Sparkles size={13} /> FIELDOPS SENTINEL AI
           </p>
-          <h1 className="mt-6 font-display text-4xl font-bold leading-tight">Plataforma agentic para inteligência de operações de campo.</h1>
-          <p className="mt-4 text-sm text-slate-200">Preveja risco, priorize decisões, aplique políticas de negócio e mantenha humanos no controle com auditoria completa.</p>
+          <h1 className="mt-6 font-display text-4xl font-bold leading-tight">Operational Loss Prevention Engine for field service operations.</h1>
+          <p className="mt-4 text-sm text-slate-200">
+            Predict SLA leakage, prioritize interventions, enforce policies, and keep humans in control with a full audit trail.
+          </p>
         </div>
       </section>
 
       <section className="flex items-center justify-center p-6">
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="panel w-full max-w-md p-8">
-          <h2 className="font-display text-2xl font-bold text-slate-900">Acesso Operacional</h2>
-          <p className="mt-1 text-sm text-slate-500">Entre para acessar o centro de comando.</p>
+          <h2 className="font-display text-2xl font-bold text-slate-900">Sign In</h2>
+          <p className="mt-1 text-sm text-slate-500">Access the command center with a demo role.</p>
 
           <div className="mt-5 flex flex-wrap gap-2">
             {Object.entries(presets).map(([role, creds]) => (
@@ -75,12 +77,12 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-3">
-            <Input placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} />
-            <Input type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
             {error && <p className="text-sm text-red-600">{error}</p>}
-            <Button className="w-full" disabled={loading}>{loading ? "Entrando..." : "Entrar no Centro de Comando"}</Button>
+            <Button className="w-full" disabled={loading}>{loading ? "Signing in..." : "Enter Command Center"}</Button>
           </form>
-          <p className="mt-4 inline-flex items-center gap-1 text-xs text-slate-500"><ShieldCheck size={13} /> Ações críticas com aprovação humana</p>
+          <p className="mt-4 inline-flex items-center gap-1 text-xs text-slate-500"><ShieldCheck size={13} /> Critical actions require human approval</p>
         </motion.div>
       </section>
     </div>

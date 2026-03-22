@@ -1,4 +1,5 @@
-from functools import lru_cache
+﻿from functools import lru_cache
+
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -25,6 +26,7 @@ class Settings(BaseSettings):
     model_delay_path: str = "ml/models/delay_model.pkl"
     model_noshow_path: str = "ml/models/noshow_model.pkl"
     model_reschedule_path: str = "ml/models/reschedule_model.pkl"
+    model_sla_path: str = "ml/models/sla_breach_model.pkl"
     feature_columns_path: str = "ml/models/feature_columns.json"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=False)
