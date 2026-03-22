@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { ShieldCheck, Sparkles } from "lucide-react";
 import { apiFetch, setToken } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,45 +33,56 @@ export default function LoginPage() {
       setToken(data.access_token);
       router.push("/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(err instanceof Error ? err.message : "Falha no login");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="panel w-full max-w-md p-8"
-      >
-        <h1 className="font-display text-2xl font-bold">FIELDOPS SENTINEL AI</h1>
-        <p className="mt-2 text-sm text-slate-500">Agentic operations intelligence platform for field service teams.</p>
-
-        <div className="mt-5 flex gap-2">
-          {Object.entries(presets).map(([role, creds]) => (
-            <button
-              key={role}
-              className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100"
-              onClick={() => {
-                setEmail(creds.email);
-                setPassword(creds.password);
-              }}
-              type="button"
-            >
-              {role}
-            </button>
-          ))}
+    <div className="grid min-h-screen lg:grid-cols-2">
+      <section className="relative hidden overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 p-10 text-white lg:block">
+        <div className="absolute -left-14 top-10 h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
+        <div className="absolute -right-12 bottom-12 h-64 w-64 rounded-full bg-indigo-400/25 blur-3xl" />
+        <div className="relative z-10 max-w-xl">
+          <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs uppercase tracking-[0.16em]">
+            <Sparkles size={13} /> FieldOps Sentinel AI
+          </p>
+          <h1 className="mt-6 font-display text-4xl font-bold leading-tight">Plataforma agentic para inteligência de operações de campo.</h1>
+          <p className="mt-4 text-sm text-slate-200">Preveja risco, priorize decisões, aplique políticas de negócio e mantenha humanos no controle com auditoria completa.</p>
         </div>
+      </section>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-3">
-          <Input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <Input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <Button className="w-full" disabled={loading}>{loading ? "Signing in..." : "Sign in"}</Button>
-        </form>
-      </motion.div>
+      <section className="flex items-center justify-center p-6">
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="panel w-full max-w-md p-8">
+          <h2 className="font-display text-2xl font-bold text-slate-900">Acesso Operacional</h2>
+          <p className="mt-1 text-sm text-slate-500">Entre para acessar o centro de comando.</p>
+
+          <div className="mt-5 flex flex-wrap gap-2">
+            {Object.entries(presets).map(([role, creds]) => (
+              <button
+                key={role}
+                className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100"
+                onClick={() => {
+                  setEmail(creds.email);
+                  setPassword(creds.password);
+                }}
+                type="button"
+              >
+                {role}
+              </button>
+            ))}
+          </div>
+
+          <form onSubmit={handleSubmit} className="mt-6 space-y-3">
+            <Input placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} />
+            {error && <p className="text-sm text-red-600">{error}</p>}
+            <Button className="w-full" disabled={loading}>{loading ? "Entrando..." : "Entrar no Centro de Comando"}</Button>
+          </form>
+          <p className="mt-4 inline-flex items-center gap-1 text-xs text-slate-500"><ShieldCheck size={13} /> Ações críticas com aprovação humana</p>
+        </motion.div>
+      </section>
     </div>
   );
 }

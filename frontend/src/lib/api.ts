@@ -35,3 +35,5 @@ export function clearToken(): void {
   if (typeof window === "undefined") return;
   localStorage.removeItem("fieldops_token");
 }
+
+

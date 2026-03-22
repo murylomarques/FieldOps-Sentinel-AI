@@ -60,3 +60,15 @@ def risk_by_region(db: Session = Depends(get_db), _user: User = Depends(get_curr
 @router.get("/executive-insights")
 def executive_insights(db: Session = Depends(get_db), _user: User = Depends(get_current_user)) -> dict:
     return report_agent.run(db)
+
+
+@router.get("/demo-status")
+def demo_status(db: Session = Depends(get_db), _user: User = Depends(get_current_user)) -> dict:
+    return {
+        "orders": db.query(Order).count(),
+        "recommendations": db.query(Recommendation).count(),
+        "decisions": db.query(Decision).count(),
+        "pending_human_approval": db.query(Recommendation).filter(Recommendation.status == "pending_human_approval").count(),
+        "approved": db.query(Decision).filter(Decision.human_decision == "approved").count(),
+        "rejected": db.query(Decision).filter(Decision.human_decision == "rejected").count(),
+    }

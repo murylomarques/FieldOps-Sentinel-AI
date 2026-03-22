@@ -12,5 +12,5 @@ RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 COPY backend /app/backend
 COPY ml /app/ml
 
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app/backend
 EXPOSE 8000

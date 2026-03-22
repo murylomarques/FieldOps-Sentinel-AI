@@ -20,3 +20,4 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   if (!ready) return <div className="p-10 text-slate-500">Checking session...</div>;
   return <>{children}</>;
 }
+

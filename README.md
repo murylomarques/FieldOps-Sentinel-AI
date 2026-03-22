@@ -1,33 +1,33 @@
 # FIELDOPS SENTINEL AI
 
-**An agentic operations intelligence platform for field service teams.**
+**Uma plataforma agentic de inteligência operacional para equipes de campo.**
 
-FIELDOPS Sentinel AI helps dispatch centers, telecom operators, utilities teams, and maintenance operations run field service execution with proactive risk intelligence and auditable decision support.
+O FIELDOPS Sentinel AI foi desenvolvido para resolver problemas reais de operação de campo com IA aplicada, governança humana e rastreabilidade completa.
 
-## Why This Project Matters
-Field service organizations lose margin and SLA reliability because operational decisions are slow, manual, and not traceable.
+## Proposta de Valor
+Em operações de telecom, utilities, manutenção e assistência técnica, é comum ocorrer:
+- priorização ruim de ordens;
+- alto volume de reagendamentos;
+- risco de atraso e quebra de SLA;
+- decisões lentas e sem explicabilidade;
+- ausência de trilha de auditoria para recomendações da IA.
 
-This platform addresses:
-- poor prioritization of service orders
-- high no-show and rescheduling rates
-- regional under/over-allocation of technicians
-- limited explainability of AI recommendations
-- no audit trail for high-impact decisions
+A plataforma ataca esses pontos com uma arquitetura multiagente, visão executiva e fluxo Human-in-the-Loop.
 
-## Product Capabilities
-- ingest and normalize service orders/schedules
-- predict delay, no-show, SLA-breach and rescheduling risk
-- recommend dispatch prioritization and redistribution
-- explain decisions in business language and operations language
-- enforce policy guardrails before critical actions
-- require human approval for high-impact actions
-- expose executive and model monitoring dashboards
+## O Que Torna Este Projeto Diferente
+- arquitetura multiagente funcional (não chatbot genérico);
+- previsão de risco operacional com modelos tabulares (delay, no-show, reschedule);
+- recomendações de dispatch com policy guard;
+- ações críticas obrigatoriamente validadas por humanos;
+- auditoria por `request_id` e `decision_id`;
+- dashboard premium para operação e gestão executiva;
+- dataset demo realista carregado automaticamente.
 
-## System Architecture
+## Arquitetura
 
 ```mermaid
 flowchart LR
-  UI[Next.js Executive Dashboard] --> API[FastAPI Backend]
+  UI[Frontend Next.js] --> API[FastAPI]
   API --> IA[Intake Agent]
   IA --> RS[Risk Scoring Agent]
   RS --> DR[Dispatch Recommendation Agent]
@@ -36,24 +36,30 @@ flowchart LR
   EX --> DB[(PostgreSQL)]
   DB --> ER[Executive Report Agent]
   API --> MON[Monitoring + Audit APIs]
-  ML[ML Training Pipeline] --> ART[Model Artifacts]
+  ML[Pipeline de Treino] --> ART[Artefatos de Modelo]
   ART --> RS
 ```
 
-## Multi-Agent Flow
-1. **Intake Agent**: validates required fields, normalizes and classifies order.
-2. **Risk Scoring Agent**: predicts delay/no-show/reschedule risks from tabular model.
-3. **Dispatch Recommendation Agent**: proposes priority, window and technician/region fallback.
-4. **Policy Guard Agent**: blocks skill mismatch and flags critical SLA conditions.
-5. **Explainability Agent**: creates executive and operational reasoning.
-6. **Executive Report Agent**: aggregates bottlenecks, risk hotspots, and load alerts.
+## Agentes de IA
+1. **Intake Agent**: recebe e normaliza ordens de serviço.
+2. **Risk Scoring Agent**: estima risco de atraso, no-show e reagendamento.
+3. **Dispatch Recommendation Agent**: sugere priorização e redistribuição.
+4. **Policy Guard Agent**: bloqueia violações de regra de negócio.
+5. **Explainability Agent**: traduz racional técnico para linguagem de negócio.
+6. **Executive Report Agent**: consolida gargalos e riscos agregados.
 
-## Tech Stack
+## Human-in-the-Loop
+- recomendações críticas entram como `pending_human_approval`;
+- aprovador/revisor adiciona justificativa;
+- decisão humana fica vinculada ao `decision_id`;
+- comparação IA vs decisão final é persistida para auditoria.
+
+## Stack Técnica
 ### Frontend
 - Next.js 15
 - TypeScript
 - Tailwind CSS
-- shadcn/ui-style component structure (`components.json` + `src/components/ui`)
+- estrutura `shadcn/ui`
 - Recharts
 - Framer Motion
 
@@ -62,21 +68,21 @@ flowchart LR
 - Pydantic
 - SQLAlchemy
 - PostgreSQL
-- JWT auth (manager / dispatcher / analyst)
+- JWT (manager / dispatcher / analyst)
 
-### AI / Analytics
-- pandas, numpy
-- scikit-learn pipelines
-- XGBoost classifiers (delay, no-show, reschedule)
-- synthetic data generation and training scripts
+### IA / Analytics
+- pandas
+- numpy
+- scikit-learn
+- XGBoost
 
-### Infra / Quality
+### Infra / Qualidade
 - Docker Compose
 - Makefile
 - `.env.example`
 - GitHub Actions (lint + test + build)
 
-## Repository Structure
+## Estrutura
 ```text
 /frontend
 /backend
@@ -87,108 +93,99 @@ flowchart LR
 /.github/workflows
 ```
 
-## Screenshots (Placeholders)
-- `docs/screenshots/login.png`
-- `docs/screenshots/command-center.png`
-- `docs/screenshots/orders.png`
-- `docs/screenshots/recommendations-queue.png`
-- `docs/screenshots/model-monitoring.png`
-
-## Local Setup
-1. Copy env file:
+## Como Rodar
+1. Copie o env:
    - `cp .env.example .env`
-2. Start services:
-   - `docker compose up --build`
-3. Frontend:
-   - `http://localhost:3000`
-4. Backend docs:
-   - `http://localhost:8000/docs`
+2. Suba os serviços:
+   - `docker compose up -d --build`
+3. Acesse:
+   - Frontend: `http://localhost:3000/login`
+   - API docs: `http://localhost:8000/docs`
 
-### Demo Credentials
-- manager: `manager@fieldops.ai` / `manager123`
-- dispatcher: `dispatcher@fieldops.ai` / `dispatcher123`
-- analyst: `analyst@fieldops.ai` / `analyst123`
+## Credenciais de Demo
+- `manager@fieldops.ai / manager123`
+- `dispatcher@fieldops.ai / dispatcher123`
+- `analyst@fieldops.ai / analyst123`
 
-## Data & Model Workflow
-### Generate synthetic dataset
+## Dados Reais de Demonstração (Auto-Seed)
+Quando o banco está vazio, o backend gera automaticamente cenário operacional completo.
+
+Exemplo real validado:
+- `orders`: 180
+- `recommendations`: 180
+- `decisions`: 180
+- `pending_human_approval`: 37+
+- com aprovações e rejeições humanas registradas
+
+Endpoint de validação:
+- `GET /api/v1/dashboard/demo-status`
+
+## Pipeline de Dados e Treino
+### Gerar dataset sintético
 - `python ml/scripts/generate_synthetic_data.py --rows 5000`
 
-### Train models
+### Treinar modelos
 - `python ml/scripts/train_models.py`
 
-### Seed demo data through API
+### Inserir ordens via API
 - `python scripts/seed_demo_data.py --rows 120`
 
-### Included demo artifacts
-- sample synthetic data: `ml/data/demo_orders_sample.csv`
-- baseline metrics snapshot: `ml/reports/model_metrics_baseline.json`
+## Módulos do Produto
+- **Login** com perfis operacionais
+- **Centro de Comando** com KPIs, risco regional e fila HITL
+- **Ordens** com grade avançada e abertura de caso
+- **Detalhe da Ordem** com narrativa de decisão
+- **Fila de Recomendações** com aprovar/rejeitar + justificativa
+- **Insights Executivos** para liderança
+- **Monitoramento de Modelo** com latência, drift e override
 
-## Dashboard Modules
-- **Login Screen** with role-based demo access
-- **Command Center** with KPIs, risk by region, pending approvals
-- **Orders Page** with searchable operational table
-- **Order Detail** with order context + recommendation status
-- **Recommendations Queue** with approve/reject + justification
-- **Executive Insights** with bottlenecks and regional risk
-- **Model Monitoring** with latency, drift simulation, score distribution, override rate
+## Métricas de Negócio Expostas
+- percentual de ordens em risco
+- score médio de risco de SLA
+- taxa de aprovação humana
+- taxa de override
+- latência média de resposta
+- atrasos evitados projetados
+- redução de backlog projetada
+- impacto operacional estimado
 
-## Business Metrics Exposed
-- percent of orders at risk
-- average SLA risk score
-- approval rate
-- override rate
-- average response latency
-- projected avoided delays
-- projected backlog reduction
-- estimated operational impact
+## Observabilidade e Governança
+- logs estruturados
+- correlação por `request_id`
+- trilha por `decision_id`
+- histórico em `audit_logs`
+- monitoramento de latência e override
+- políticas de ação crítica com aprovação humana
 
-## Observability
-- structured JSON logs
-- `x-request-id` correlation on every request
-- `decision_id` tracking for recommendation lifecycle
-- `audit_logs` table with actor, action, payload, timestamp
-- model monitoring endpoint with latency, drift simulation and overrides
+## Segurança
+- configuração via ambiente (`.env.example`)
+- validação forte de entrada (Pydantic)
+- CORS configurado
+- autenticação JWT
+- rate limiting básico
+- sem segredo hardcoded para produção
 
-## Governance & Human-In-The-Loop
-- high-impact recommendations default to `pending_human_approval`
-- explicit approve/reject action with human justification
-- capture of approver identity and timestamp
-- AI recommendation vs final human outcome persisted for audit
+## Endpoints
+Veja documentação em: `docs/endpoints.md`
 
-## Security Notes
-- no hardcoded production secrets
-- env-driven configuration (`.env.example`)
-- strong Pydantic input validation
-- JWT access control
-- CORS configured
-- basic in-memory rate limiting
-- full audit trail for critical decisions
-
-## Endpoint Documentation
-See: [docs/endpoints.md](docs/endpoints.md)
-
-## Production Considerations
-- replace in-memory rate limiter with Redis-backed limiter
-- add alembic migrations and secret manager integration
-- add model registry/versioning and shadow deployments
-- implement background queues for high-throughput ingestion
-- integrate real geospatial routing engine
+## Considerações de Produção
+- migrar para Alembic
+- rate limiting distribuído (Redis)
+- observabilidade com OpenTelemetry/Prometheus
+- filas assíncronas para alta vazão
+- versionamento de modelos e rollout controlado
 
 ## Roadmap
-- real route optimization
-- real-time streaming events
-- LLM-powered incident reasoning
-- multi-tenant SaaS mode
-- geospatial optimization
-- online learning
-- external integrations (ERP/CRM/workforce systems)
+- otimização real de rotas geoespaciais
+- eventos em tempo real (streaming)
+- reasoning com LLM para incidentes complexos
+- modo multi-tenant SaaS
+- online learning e feedback loops
+- integrações externas (ERP/CRM/WFM)
 
-## Future Improvements
-- richer policy engine with configurable rules DSL
-- uncertainty calibration and confidence intervals
-- cost-to-serve optimization layer
-- scenario simulator for dispatch tradeoff planning
-- A/B testing of recommendation strategies
-
----
-FIELDOPS Sentinel AI is built to demonstrate practical AI operations architecture with explainability, governance, and measurable business impact.
+## Por Que Este Projeto Importa
+Este projeto demonstra capacidade de entregar uma solução de IA aplicada ao mundo real com:
+- arquitetura robusta;
+- produto visualmente maduro;
+- governança e explicabilidade;
+- foco em impacto operacional mensurável.

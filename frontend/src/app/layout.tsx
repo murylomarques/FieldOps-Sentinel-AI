@@ -3,12 +3,12 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "FIELDOPS SENTINEL AI",
-  description: "An agentic operations intelligence platform for field service teams.",
+  description: "Plataforma agentic de inteligencia operacional para equipes de campo.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body>{children}</body>
     </html>
   );

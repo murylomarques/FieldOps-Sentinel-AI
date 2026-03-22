@@ -47,3 +47,5 @@ export interface RecommendationQueue {
   recommended_priority: string;
   created_at: string;
 }
+
+

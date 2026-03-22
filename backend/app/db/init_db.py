@@ -7,6 +7,7 @@ from app.models.metric import ModelMetric
 from app.models.order import Order
 from app.models.recommendation import Recommendation
 from app.models.user import User
+from app.services.demo_data_service import bootstrap_demo_operations
 
 
 def init_db() -> None:
@@ -21,5 +22,8 @@ def init_db() -> None:
             ]
             db.add_all(users)
             db.commit()
+
+        if not db.query(Order).count():
+            bootstrap_demo_operations(db, n_orders=180)
     finally:
         db.close()

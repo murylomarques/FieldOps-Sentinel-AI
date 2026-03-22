@@ -11,3 +11,4 @@ export function Badge({ label, tone = "slate" }: { label: string; tone?: "red" |
 
   return <span className={cn("rounded-full border px-2.5 py-1 text-xs font-semibold", palette)}>{label}</span>;
 }
+
