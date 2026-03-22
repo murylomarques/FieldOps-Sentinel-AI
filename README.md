@@ -1,32 +1,32 @@
 # FIELDOPS SENTINEL AI
 
-**Plataforma agentic de inteligÃªncia operacional para operaÃ§Ãµes de campo em ambiente real.**
+**Plataforma agentic de inteligência operacional para operações de campo em ambiente real.**
 
-Este projeto foi construÃ­do para demonstrar um produto de IA aplicado a operaÃ§Ãµes crÃ­ticas, com arquitetura robusta, governanÃ§a humana, explicabilidade e visÃ£o executiva.
+Este projeto foi construído para demonstrar um produto de IA aplicado a operações críticas, com arquitetura robusta, governança humana, explicabilidade e visão executiva.
 
 ## Posicionamento
-O FIELDOPS Sentinel AI apoia operaÃ§Ãµes de:
-- telecomunicaÃ§Ãµes;
+O FIELDOPS Sentinel AI apoia operações de:
+- telecomunicações;
 - utilities;
-- manutenÃ§Ã£o tÃ©cnica;
+- manutenção técnica;
 - centros de despacho;
-- gestores operacionais.
+- gestão operacional.
 
 ## Problemas Reais que o Sistema Resolve
 - ordens mal priorizadas;
 - risco elevado de atraso, no-show e reagendamento;
-- quebra de SLA por decisÃ£o tardia;
-- desequilÃ­brio de carga entre tÃ©cnicos e regiÃµes;
-- falta de explicabilidade da recomendaÃ§Ã£o da IA;
-- ausÃªncia de auditoria em decisÃµes crÃ­ticas.
+- quebra de SLA por decisão tardia;
+- desequilíbrio de carga entre técnicos e regiões;
+- falta de explicabilidade das recomendações da IA;
+- ausência de auditoria em decisões críticas.
 
-## Diferenciais de NÃ­vel Enterprise
-- pipeline multiagente funcional (nÃ£o chatbot);
-- recomendaÃ§Ã£o operacional com policy guard;
-- fluxo Humano no Loop obrigatÃ³rio para aÃ§Ãµes crÃ­ticas;
-- trilha auditÃ¡vel por `request_id` e `decision_id`;
-- dashboard executivo premium para operaÃ§Ã£o e lideranÃ§a;
-- seed automÃ¡tico com dados realistas para prova de valor imediata.
+## Diferenciais de Nível Enterprise
+- pipeline multiagente funcional (não é chatbot genérico);
+- recomendação operacional com policy guard;
+- fluxo Humano no Loop obrigatório para ações críticas;
+- trilha auditável por `request_id` e `decision_id`;
+- dashboard executivo premium para operação e liderança;
+- seed automático com dados realistas para prova de valor imediata.
 
 ## Arquitetura Geral
 
@@ -35,11 +35,11 @@ flowchart LR
   UI[Next.js Frontend] --> API[FastAPI Backend]
   API --> IA[Agente de Intake]
   IA --> RS[Agente de Risco]
-  RS --> DR[Agente de Recomendacao Operacional]
-  DR --> PG[Agente de Politica e Guardrails]
+  RS --> DR[Agente de Recomendação Operacional]
+  DR --> PG[Agente de Política e Guardrails]
   PG --> EX[Agente de Explicabilidade]
   EX --> DB[(PostgreSQL)]
-  DB --> ER[Agente de Relatorio Executivo]
+  DB --> ER[Agente de Relatório Executivo]
   API --> MON[APIs de Monitoramento e Auditoria]
   ML[Pipeline de Treino] --> ART[Artefatos de Modelo]
   ART --> RS
@@ -47,43 +47,43 @@ flowchart LR
 
 ## Fluxo Multiagente
 1. **Agente de Intake**
-   - normaliza dados de ordem;
-   - valida campos obrigatÃ³rios;
-   - classifica contexto da ordem.
+   - normaliza dados da ordem;
+   - valida campos obrigatórios;
+   - classifica o contexto da ordem.
 
 2. **Agente de Risco**
    - calcula risco de atraso;
    - calcula risco de no-show;
    - calcula risco de reagendamento;
-   - devolve score consolidado e fatores.
+   - devolve score consolidado e fatores de influência.
 
-3. **Agente de Recomendacao Operacional**
+3. **Agente de Recomendação Operacional**
    - sugere prioridade e janela operacional;
-   - propÃµe redistribuiÃ§Ã£o tÃ©cnico/regiÃ£o;
-   - combina heurÃ­stica operacional com score de risco.
+   - propõe redistribuição de técnico/região;
+   - combina heurística operacional com score de risco.
 
-4. **Agente de Politica e Guardrails**
-   - bloqueia sugestÃµes sem skill compatÃ­vel;
-   - sinaliza risco de SLA crÃ­tico;
-   - impÃµe aprovaÃ§Ã£o humana para alto impacto.
+4. **Agente de Política e Guardrails**
+   - bloqueia sugestões sem skill compatível;
+   - sinaliza risco de SLA crítico;
+   - impõe aprovação humana para alto impacto.
 
 5. **Agente de Explicabilidade**
-   - gera explicaÃ§Ã£o executiva;
-   - gera explicaÃ§Ã£o operacional;
-   - facilita auditoria e confianÃ§a.
+   - gera explicação executiva;
+   - gera explicação operacional;
+   - facilita auditoria e confiança.
 
-6. **Agente de Relatorio Executivo**
+6. **Agente de Relatório Executivo**
    - consolida gargalos;
-   - identifica regiÃµes de maior risco;
-   - aponta pressÃ£o de backlog.
+   - identifica regiões de maior risco;
+   - aponta pressão de backlog.
 
 ## Humano no Loop
-- recomendaÃ§Ãµes crÃ­ticas ficam em `pending_human_approval`;
+- recomendações críticas ficam em `pending_human_approval`;
 - operador decide aprovar/rejeitar;
-- justificativa humana Ã© registrada;
-- decisÃ£o final Ã© rastreada e auditada.
+- justificativa humana é registrada;
+- decisão final é rastreada e auditada.
 
-## Stack TÃ©cnica
+## Stack Técnica
 ### Frontend
 - Next.js 15
 - TypeScript
@@ -111,7 +111,7 @@ flowchart LR
 - `.env.example`
 - GitHub Actions (lint + teste + build)
 
-## Estrutura do RepositÃ³rio
+## Estrutura do Repositório
 ```text
 /frontend
 /backend
@@ -122,34 +122,34 @@ flowchart LR
 /.github/workflows
 ```
 
-## ExecuÃ§Ã£o Local
-1. Copie variÃ¡veis de ambiente:
+## Execução Local
+1. Copie variáveis de ambiente:
    - `cp .env.example .env`
-2. Suba os serviÃ§os:
+2. Suba os serviços:
    - `docker compose up -d --build`
 3. Acesse:
    - Frontend: `http://localhost:3000/login`
    - Swagger: `http://localhost:8000/docs`
 
-## Credenciais de DemonstraÃ§Ã£o
+## Credenciais de Demonstração
 - `manager@fieldops.ai / manager123`
 - `dispatcher@fieldops.ai / dispatcher123`
 - `analyst@fieldops.ai / analyst123`
 
 ## Prova de Valor com Dados Reais
-Quando o banco inicia vazio, o sistema realiza auto-seed com cenÃ¡rio operacional completo.
+Quando o banco inicia vazio, o sistema realiza auto-seed com cenário operacional completo.
 
 Exemplo real validado:
 - `orders`: 180
 - `recommendations`: 180
 - `decisions`: 180
-- com aprovaÃ§Ãµes e rejeiÃ§Ãµes humanas registradas
+- com aprovações e rejeições humanas registradas.
 
-Endpoint para validaÃ§Ã£o:
+Endpoint para validação:
 - `GET /api/v1/dashboard/demo-status`
 
 ## Pipeline de Dados e Treino
-### Gerar dataset sintÃ©tico
+### Gerar dataset sintético
 - `python ml/scripts/generate_synthetic_data.py --rows 5000`
 
 ### Treinar modelos
@@ -158,59 +158,59 @@ Endpoint para validaÃ§Ã£o:
 ### Alimentar ordens via API
 - `python scripts/seed_demo_data.py --rows 120`
 
-## MÃ³dulos do Produto
+## Módulos do Produto
 - **Login Operacional**
 - **Centro de Comando**
 - **Grade de Ordens**
 - **Detalhe de Caso com IA**
-- **Fila de RecomendaÃ§Ãµes CrÃ­ticas**
+- **Fila de Recomendações Críticas**
 - **Insights Executivos**
 - **Monitoramento de Modelo**
 
-## MÃ©tricas de NegÃ³cio Expostas
+## Métricas de Negócio Expostas
 - percentual de ordens em risco;
-- risco mÃ©dio de SLA;
-- taxa de aprovaÃ§Ã£o humana;
+- risco médio de SLA;
+- taxa de aprovação humana;
 - taxa de override humano;
-- latÃªncia mÃ©dia de resposta;
+- latência média de resposta;
 - atrasos evitados projetados;
-- reduÃ§Ã£o de backlog projetada;
+- redução de backlog projetada;
 - impacto operacional estimado.
 
-## Observabilidade e GovernanÃ§a
+## Observabilidade e Governança
 - logs estruturados;
-- correlaÃ§Ã£o por `request_id`;
+- correlação por `request_id`;
 - rastreio por `decision_id`;
 - auditoria em `audit_logs`;
-- monitoramento de latÃªncia e drift;
-- polÃ­tica de aprovaÃ§Ã£o humana para aÃ§Ãµes crÃ­ticas.
+- monitoramento de latência e drift;
+- política de aprovação humana para ações críticas.
 
-## SeguranÃ§a
-- configuraÃ§Ã£o por ambiente;
-- validaÃ§Ã£o forte de entrada;
+## Segurança
+- configuração por ambiente;
+- validação forte de entrada;
 - CORS;
 - JWT;
-- rate limiting bÃ¡sico;
-- sem segredos de produÃ§Ã£o no cÃ³digo.
+- rate limiting básico;
+- sem segredos de produção no código.
 
-## DocumentaÃ§Ã£o Complementar
+## Documentação Complementar
 - Endpoints: `docs/endpoints.md`
 - Arquitetura: `docs/architecture.md`
 
-## ConsideraÃ§Ãµes de ProduÃ§Ã£o
-- migraÃ§Ãµes com Alembic;
-- rate limit distribuÃ­do com Redis;
+## Considerações de Produção
+- migrações com Alembic;
+- rate limit distribuído com Redis;
 - OpenTelemetry + Prometheus + Grafana;
-- filas assÃ­ncronas para alta escala;
+- filas assíncronas para alta escala;
 - versionamento e rollout controlado de modelos.
 
 ## Roadmap
-- otimizaÃ§Ã£o geoespacial real de rotas;
-- ingestÃ£o de eventos em tempo real;
+- otimização geoespacial real de rotas;
+- ingestão de eventos em tempo real;
 - reasoning com LLM para incidentes complexos;
 - modo multi-tenant SaaS;
 - online learning;
-- integraÃ§Ãµes ERP/CRM/WFM.
+- integrações ERP/CRM/WFM.
 
 ## Resumo
-Este projeto representa um blueprint realista de IA aplicada a operaÃ§Ãµes: produto com apresentaÃ§Ã£o premium, arquitetura sÃ³lida e governanÃ§a adequada para contexto corporativo.
+Este projeto representa um blueprint realista de IA aplicada a operações: produto com apresentação premium, arquitetura sólida e governança adequada para contexto corporativo.
