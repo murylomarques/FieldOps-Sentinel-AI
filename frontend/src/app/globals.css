@@ -1,0 +1,22 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-background text-foreground font-sans;
+  background-image: radial-gradient(circle at 10% 10%, rgba(15, 118, 110, 0.14), transparent 38%), radial-gradient(circle at 85% 5%, rgba(10, 77, 162, 0.16), transparent 32%);
+}
+
+.panel {
+  @apply bg-surface rounded-2xl shadow-panel border border-slate-200;
+}
+
+.kpi-card {
+  @apply panel p-5;
+}
