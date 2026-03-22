@@ -1,19 +1,40 @@
-# Architecture Notes
+# Arquitetura TÃ©cnica
 
-## Agent Flow
-1. Intake Agent normalizes and validates incoming service order.
-2. Risk Scoring Agent predicts delay / no-show / reschedule risks.
-3. Dispatch Recommendation Agent proposes priority and resource reassignment.
-4. Policy Guard Agent enforces hard business constraints.
-5. Explainability Agent writes business and operational rationales.
-6. Executive Report Agent aggregates strategic insights.
+## Fluxo Multiagente
+1. **Agente de Intake**
+Valida e normaliza dados da ordem de serviÃ§o.
 
-## Governance Model
-- Every AI recommendation receives a `decision_id`.
-- High-impact actions remain `pending_human_approval`.
-- Approve/reject events are audited with actor, reason, and timestamp.
+2. **Agente de Risco**
+Calcula risco de atraso, no-show e reagendamento com modelo tabular.
 
-## Observability
-- Structured logs at request level.
-- Rate limiting and request correlation via `request_id`.
-- Monitoring endpoint reports latency, drift simulation, and override rate.
+3. **Agente de Recomendacao Operacional**
+Sugere prioridade operacional, janela e redistribuiÃ§Ã£o de execuÃ§Ã£o.
+
+4. **Agente de Politica e Guardrails**
+Impede aÃ§Ãµes que violem regras de skill, SLA crÃ­tico e impacto sem aprovaÃ§Ã£o.
+
+5. **Agente de Explicabilidade**
+Gera justificativa em linguagem operacional e executiva.
+
+6. **Agente de Relatorio Executivo**
+Consolida gargalos, hotspots regionais e pressÃ£o de backlog.
+
+## Modelo de GovernanÃ§a
+- Cada recomendaÃ§Ã£o recebe um `decision_id` Ãºnico.
+- AÃ§Ãµes de alto impacto ficam em `pending_human_approval`.
+- AprovaÃ§Ã£o/rejeiÃ§Ã£o humana exige justificativa.
+- DecisÃ£o final, autor e timestamp sÃ£o auditados.
+
+## Observabilidade
+- logs estruturados em JSON;
+- correlaÃ§Ã£o por `request_id`;
+- trilha completa por `decision_id`;
+- mÃ©tricas de latÃªncia, volume e override humano;
+- endpoint dedicado de monitoramento de modelo.
+
+## Camadas da SoluÃ§Ã£o
+- **Frontend:** visual executivo premium com foco em operaÃ§Ã£o real.
+- **Backend:** API FastAPI com domÃ­nio orientado a decisÃµes.
+- **Dados:** PostgreSQL com histÃ³rico operacional e auditoria.
+- **IA:** modelos tabulares + heurÃ­sticas de dispatch + guardrails.
+- **GovernanÃ§a:** human-in-the-loop obrigatÃ³rio para decisÃµes crÃ­ticas.

@@ -1,43 +1,99 @@
-# API Endpoints
+# Endpoints da API
 
 Base URL: `/api/v1`
 
-## Auth
-- `POST /auth/login`
-  - body: `{ email, password }`
-  - response: `{ access_token, token_type }`
-- `GET /auth/me`
-  - header: `Authorization: Bearer <token>`
+## Autenticação
+### `POST /auth/login`
+**Descrição:** autentica usuário e retorna JWT.
 
-## Orders
-- `POST /orders`
-  - Creates/updates service order and triggers full agentic pipeline.
-- `GET /orders?city=&region=&priority=&q=`
-  - Filtered listing for operations table.
-- `GET /orders/{order_id}`
-  - Order detail for case investigation.
+**Body**
+```json
+{
+  "email": "manager@fieldops.ai",
+  "password": "manager123"
+}
+```
 
-## Recommendations & Human Approval
-- `GET /recommendations/queue`
-  - Pending recommendations requiring operator decision.
-- `GET /recommendations/{decision_id}`
-  - Recommendation details.
-- `POST /recommendations/approve`
-  - body: `{ decision_id, approve, justification }`
-- `GET /recommendations/decision/{decision_id}`
-  - Full AI + human decision trace.
+**Resposta**
+```json
+{
+  "access_token": "<jwt>",
+  "token_type": "bearer"
+}
+```
 
-## Dashboard & Executive Insights
-- `GET /dashboard/kpis`
-- `GET /dashboard/risk-by-region`
-- `GET /dashboard/executive-insights`
+### `GET /auth/me`
+**Descrição:** retorna contexto do usuário autenticado.
 
-## Monitoring
-- `GET /monitoring/models`
+**Headers**
+- `Authorization: Bearer <token>`
 
-## Health
-- `GET /health`
+---
 
-## Request Tracking
-- All responses include `x-request-id` header.
-- Decision workflows are linked via `decision_id` and persisted in `audit_logs`.
+## Ordens
+### `POST /orders`
+**Descrição:** cria/atualiza ordem de serviço e aciona pipeline multiagente completo.
+
+### `GET /orders?city=&region=&priority=&q=`
+**Descrição:** lista ordens com filtros para operação.
+
+### `GET /orders/{order_id}`
+**Descrição:** detalhamento completo da ordem para investigação.
+
+---
+
+## Recomendações e Governança Humana
+### `GET /recommendations/queue`
+**Descrição:** lista recomendações pendentes de aprovação humana.
+
+### `GET /recommendations/{decision_id}`
+**Descrição:** retorna recomendação pelo `decision_id`.
+
+### `POST /recommendations/approve`
+**Descrição:** aprova/rejeita recomendação crítica.
+
+**Body**
+```json
+{
+  "decision_id": "DEC-ABC123",
+  "approve": true,
+  "justification": "Revisado pelo dispatcher"
+}
+```
+
+### `GET /recommendations/decision/{decision_id}`
+**Descrição:** retorna trilha completa IA + decisão humana.
+
+---
+
+## Dashboard Executivo
+### `GET /dashboard/kpis`
+Métricas de negócio e performance operacional.
+
+### `GET /dashboard/risk-by-region`
+Distribuição de risco por região.
+
+### `GET /dashboard/executive-insights`
+Insights agregados para liderança.
+
+### `GET /dashboard/demo-status`
+Status do cenário real de demonstração (ordens, recomendações, decisões, aprovadas/rejeitadas).
+
+---
+
+## Monitoramento de Modelo
+### `GET /monitoring/models`
+Latência, volume, drift simulado e taxa de override humano.
+
+---
+
+## Saúde
+### `GET /health`
+Checagem de vida da API.
+
+---
+
+## Rastreabilidade
+- Todas as respostas incluem `x-request-id`.
+- Decisões críticas são vinculadas por `decision_id`.
+- A trilha de auditoria é persistida na tabela `audit_logs`.

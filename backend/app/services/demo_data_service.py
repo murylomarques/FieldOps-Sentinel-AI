@@ -69,14 +69,14 @@ def _build_order(index: int) -> dict:
 def bootstrap_demo_operations(db: Session, n_orders: int = 180) -> dict:
     existing_orders = db.query(Order).count()
     if existing_orders > 0:
-        return {"seeded": 0, "reason": "orders_already_exist", "existing_orders": existing_orders}
+        return {"seeded": 0, "reason": "ordens_ja_existem", "existing_orders": existing_orders}
 
     random.seed(42)
     generated = 0
     for idx in range(1, n_orders + 1):
         payload = _build_order(idx)
         orchestrator.upsert_order(db, payload)
-        orchestrator.process_order(db, payload, request_id="BOOTSTRAP-DEMO", actor="system@fieldops.ai")
+        orchestrator.process_order(db, payload, request_id="SEED-DEMO", actor="sistema@fieldops.ai")
         generated += 1
 
     pending = (
@@ -88,14 +88,14 @@ def bootstrap_demo_operations(db: Session, n_orders: int = 180) -> dict:
 
     for rec in pending[: int(len(pending) * 0.6)]:
         approve = random.random() > 0.22
-        justification = "Approved by demo dispatcher" if approve else "Rejected due to field constraints"
+        justification = "Aprovado pelo dispatcher de demonstracao" if approve else "Rejeitado por restricoes operacionais"
         orchestrator.apply_human_decision(
             db,
             decision_id=rec.decision_id,
             actor="dispatcher@fieldops.ai",
             approve=approve,
             reason=justification,
-            request_id="BOOTSTRAP-HITL",
+            request_id="SEED-HITL",
         )
 
     return {"seeded": generated, "pending_after_seed": db.query(Recommendation).filter(Recommendation.status == "pending_human_approval").count()}
